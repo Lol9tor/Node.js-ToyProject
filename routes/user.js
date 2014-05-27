@@ -1,6 +1,6 @@
 // get list of users
 exports.userlist = function (req, res) {
-    var collection = db.get('usercollection');
+    var collection = app.locals.db.get('usercollection');
     collection.find({}, {}, function (e, docs) {
         res.render('userList', {
             "userlist": docs
@@ -16,7 +16,7 @@ exports.newuser = function (req, res) {
 exports.adduser = function (req, res) {
     var username = req.body.username;
     var email = req.body.useremail;
-    var collection = db.get('usercollection');
+    var collection = app.locals.db.get('usercollection');
     collection.insert({"username": username, "email": email}, function (err, doc) {
         if (err) {
             res.send("There is an error adding to DB");
@@ -27,4 +27,11 @@ exports.adduser = function (req, res) {
             res.redirect("users");
         }
     });
+};
+
+exports.edituser = function (req, res) {
+    var username = req.body.username;
+    var email = req.body.useremail;
+    var collection = app.locals.db.get('usercollection');
+    //collection.
 };

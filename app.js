@@ -11,9 +11,9 @@ var users = require('./routes/user');
 
 var mongo = require('mongodb');
 var monk = require('monk');
-db = monk('localhost:27017/notepad');
+var db = monk('localhost:27017/notepad');
 
-var app = express();
+app = express();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -24,7 +24,8 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded());
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname + '/public')));
+app.use('/static', express.static(__dirname + '/public'));
 app.use(app.router);
 
 app.get('/', routes.index);
@@ -32,12 +33,9 @@ app.get('/hello', routes.hello);
 app.get('/users', users.userlist);
 app.get('/newuser', users.newuser);
 app.post('/adduser', users.adduser);
+app.put('/edituser', users.edituser);
 
-// mongoDB
-app.use(function (req, res, next) {
-    req.db = db;
-    next();
-});
+app.locals.db = db;
 
 /// catch 404 and forwarding to error handler
 app.use(function (req, res, next) {

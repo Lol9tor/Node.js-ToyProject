@@ -1,5 +1,5 @@
 exports.hello = function (req, res) {
-    res.render('hello', { title: 'Hello, World!' });
+    res.sendfile('./public/pages/admin.html');
 };
 
 exports.index = function (req, res) {
