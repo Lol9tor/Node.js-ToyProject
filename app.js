@@ -31,6 +31,7 @@ app.get('/', routes.index);
 app.get('/hello', routes.hello);
 app.get('/users', users.userlist);
 app.get('/newuser', users.newuser);
+app.post('/adduser', users.adduser);
 
 // mongoDB
 app.use(function (req, res, next) {
