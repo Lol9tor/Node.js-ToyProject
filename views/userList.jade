@@ -2,6 +2,8 @@ extends layout
 block content
     h1.
         User List
+    form(action='/newuser')
+        input(type='submit', value='Add User')
     ul
         each user, i in userlist
             li
