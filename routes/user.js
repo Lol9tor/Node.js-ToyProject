@@ -5,14 +5,14 @@ exports.userlist = function (req, res) {
         res.json(docs);
     });
 };
-//check if login already busy
+// check if login already busy
 exports.checklogin = function (req, res) {
     var collection = app.locals.db.get('usercollection');
     collection.findOne({login: req.param('login')}, function (e, doc) {
         res.send(!doc ? 'true' : 'false');
     });
 };
-
+// adding user
 exports.adduser = function (req, res) {
     var login = req.body.login;
     var password = req.body.password;
@@ -33,7 +33,7 @@ exports.adduser = function (req, res) {
         }
     });
 };
-
+// deleting user
 exports.delete = function (req, res) {
     var login = req.params.user_login;
     var collection = app.locals.db.get('usercollection');
@@ -42,6 +42,27 @@ exports.delete = function (req, res) {
             console.log('deleting error');
         } else {
             console.log('deleted ' + login);
+            res.statusCode = 200;
+            res.send('ok');
+        }
+    });
+};
+// updating user
+exports.update = function (req, res) {
+    var user = new Object();
+    user._id = req.body._id;
+    user.login = req.body.login;
+    user.password = req.body.password;
+    user.email = req.body.email;
+    user.firstName = req.body.firstName;
+    user.lastName = req.body.lastName;
+    user.birthday = req.body.birthday;
+    user.role = req.body.role;
+    var collection = app.locals.db.get('usercollection');
+    collection.update({_id: user._id}, user, {upsert: false, multi: false}, function (e, doc) {
+        if (e) {
+            console.log('updating error');
+        } else {
             res.statusCode = 200;
             res.send('ok');
         }

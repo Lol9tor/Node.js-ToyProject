@@ -3,7 +3,7 @@ App.Models.User = Backbone.Model.extend({
     sync: function (method, model, options) {
         if (method === 'update') {
             options.url = 'service';
-            if (model.get('id') === undefined) {
+            if (model.get('_id') === undefined) {
                 method = 'create';
             }
         }

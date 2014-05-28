@@ -34,6 +34,7 @@ app.get('/service', users.userlist);
 app.get('/check', users.checklogin);
 app.post('/service', users.adduser);
 app.del('/service/:user_login', users.delete);
+app.put('/service', users.update);
 
 app.locals.db = db;
 
