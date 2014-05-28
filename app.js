@@ -16,6 +16,7 @@ var db = monk('localhost:27017/notepad');
 app = express();
 
 // view engine setup
+app.set('port', process.env.port || 3000);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
@@ -29,12 +30,9 @@ app.use('/static', express.static(__dirname + '/public'));
 app.use(app.router);
 
 app.get('/', routes.index);
-app.get('/hello', routes.hello);
-app.get('/users', users.userlist);
 app.get('/service', users.userlist);
-app.get('/newuser', users.newuser);
-app.post('/adduser', users.adduser);
-app.put('/edituser', users.edituser);
+app.get('/check', users.checklogin);
+app.post('/service', users.adduser);
 
 app.locals.db = db;
 

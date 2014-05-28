@@ -130,7 +130,7 @@ App.Views.EditUser = Backbone.View.extend({
         $('#firstName').val(this.model.get('firstName'));
         $('#lastName').val(this.model.get('lastName'));
         $('#birthday').val(this.convertDate(this.model.get('birthday')));
-        $('#role').val(this.model.get('role').name);
+        $('#role').val(this.model.get('role'));
         $('#login').prop('disabled', true);
         this.$el.show();
     },
@@ -139,7 +139,7 @@ App.Views.EditUser = Backbone.View.extend({
         if (this.$el.valid()) {
             this.model.unset('age', {silent: true});
             this.model.save({
-                id: this.model.get('id'),
+                _id: this.model.get('_id'),
                 login: $('#login').val(),
                 password: $('#password').val(),
                 confirm: $('#confirm').val(),

@@ -5,31 +5,32 @@ exports.userlist = function (req, res) {
         res.json(docs);
     });
 };
-
-// get new user page
-exports.newuser = function (req, res) {
-    res.render('newUser', {title: 'Add New User'});
-};
-
-exports.adduser = function (req, res) {
-    var username = req.body.username;
-    var email = req.body.useremail;
+//check if login already busy
+exports.checklogin = function (req, res) {
     var collection = app.locals.db.get('usercollection');
-    collection.insert({"username": username, "email": email}, function (err, doc) {
-        if (err) {
-            res.send("There is an error adding to DB");
-        } else {
-            // If it worked, set the header so the address bar doesn't still say /adduser
-            res.location("users");
-            // And forward to success page
-            res.redirect("users");
-        }
+    collection.findOne({login: req.param('login')}, function (e, doc) {
+        res.send(!doc ? 'true' : 'false');
     });
 };
 
-exports.edituser = function (req, res) {
-    var username = req.body.username;
-    var email = req.body.useremail;
+exports.adduser = function (req, res) {
+    var login = req.body.login;
+    var password = req.body.password;
+    var email = req.body.email;
+    var firstName = req.body.firstName;
+    var lastName = req.body.lastName;
+    var birthday = req.body.birthday;
+    var role = req.body.role;
     var collection = app.locals.db.get('usercollection');
-    //collection.
+    collection.insert({"login": login, "password": password, "email": email, "firstName": firstName,
+        "lastName": lastName, "birthday": birthday, "role": role}, function (err, doc) {
+        if (err) {
+            res.send("There is an error adding to DB");
+            console.log('error');
+        } else {
+            console.log('added');
+            res.statusCode = 200;
+            res.send('ok');
+        }
+    });
 };
