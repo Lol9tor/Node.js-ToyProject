@@ -31,6 +31,7 @@ app.use(app.router);
 app.get('/', routes.index);
 app.get('/hello', routes.hello);
 app.get('/users', users.userlist);
+app.get('/service', users.userlist);
 app.get('/newuser', users.newuser);
 app.post('/adduser', users.adduser);
 app.put('/edituser', users.edituser);

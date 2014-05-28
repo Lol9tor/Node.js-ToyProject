@@ -2,9 +2,7 @@
 exports.userlist = function (req, res) {
     var collection = app.locals.db.get('usercollection');
     collection.find({}, {}, function (e, docs) {
-        res.render('userList', {
-            "userlist": docs
-        });
+        res.json(docs);
     });
 };
 
