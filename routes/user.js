@@ -28,7 +28,20 @@ exports.adduser = function (req, res) {
             res.send("There is an error adding to DB");
             console.log('error');
         } else {
-            console.log('added');
+            res.statusCode = 200;
+            res.send('ok');
+        }
+    });
+};
+
+exports.delete = function (req, res) {
+    var login = req.params.user_login;
+    var collection = app.locals.db.get('usercollection');
+    collection.remove({"login": login}, function (e, doc) {
+        if (e) {
+            console.log('deleting error');
+        } else {
+            console.log('deleted ' + login);
             res.statusCode = 200;
             res.send('ok');
         }
