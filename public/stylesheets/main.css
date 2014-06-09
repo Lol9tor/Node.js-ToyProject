@@ -1,0 +1,70 @@
+body {
+	background: #8B8989;
+	font-family: Arial, sans-serif;
+	font-size: 14pt;
+	font-style: normal;
+}
+table {
+	height: 30px;
+	padding: 10px;
+	margin: 30px 0 0 20px;
+}
+td, tr {padding: 10px;}
+table.foo {
+	border: solid 2px;
+	margin: 0;
+	padding: 0;	
+}
+.foo td {
+	height: 30px;
+	border: solid 1px;
+}
+a:link {
+	color : SaddleBrown;
+	font-family : comic sans ms;
+	font-size: 16pt;
+} 
+/* The hint to Hide and Show */
+.hint {
+   	border: solid 1px;
+	display: none;
+	padding: 0 5px 0 5px;
+	background: yellow;
+	position: relative; 
+	left: 25px;
+}
+.error {
+    border: solid 1px;
+    display: none;
+    padding: 0 5px 0 5px;
+    background: red;
+    position: relative;
+    left: 25px;
+}
+.complete {
+    border: solid 1px;
+    display: none;
+    padding: 0 5px 0 5px;
+    background: green;
+    position: relative;
+    left: 25px;
+}
+.newRow {
+    background: green;
+    transition: 3s;
+}
+
+a:hover {
+	color : LemonChiffon; text-decoration : none;		
+}
+div#form_users {
+	font-size: 12pt;
+	font-style: italic;
+	text-align: left center;
+}
+select {
+	size: 1;
+	width: 142px;
+}
+
+
