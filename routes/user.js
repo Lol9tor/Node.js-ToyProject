@@ -68,3 +68,16 @@ exports.update = function (req, res) {
         }
     });
 };
+//get user by login
+exports.getuser = function (req, res) {
+     var login = req.params.user_login;
+     var collection = app.locals.db.get('usercollection');
+     collection.findOne({"login": login}, function (e, doc) {
+         if (e) {
+            res.send('error');
+         } else {
+            res.statusCode = 200;
+            res.json(doc);
+                    }
+     });
+};

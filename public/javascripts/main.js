@@ -1,18 +1,92 @@
 $(document).ready(function () {
-    $('#newUserLink').on('click', openForm);
+    $('#content').on('click', 'a', function (e) {
+        e.preventDefault();
+        if ($(this).attr('id') === 'deleteUser') {
+            if (window.confirm('Delete this user?')) {
+                var userLog = $(this).parent().prevAll()[6].firstChild.textContent;// login in the string with "delete"
+                var strdel = $(this).parent().parent();// string, which we delete
+                deleteUser(userLog, strdel);
+            }
+        }
+        if ($(this).attr('id') === 'newUserLink') {
+            openForm();
+        }
+        if ($(this).attr('id') === 'updateUser') {
+            var userLogin = $(this).parent().prevAll()[6].firstChild.textContent;
+            updateUser(userLogin);
+        }
+    });
     var passwordConf;
+    var table;
     $.ajax({
         type: "GET",
         url: "/service"
     })
         .done(function (msg) {
+            table = $('<table></table>').addClass('foo').attr('id', 'foo');
             drawTable(msg);
+            $("table.foo").prepend("<tr class='header'><td>#</td><td>Login</td><td>Password</td><td>Email</td><td>First Name</td><td>Last Name</td><td>Age</td><td>Role</td><td>Action</td></tr>");
         });
+    function deleteUser(login, str){
+        $.ajax({
+            type: "delete",
+            url: "service/"+login,
+            success: function() {
+                $(str).animate({backgroundColor: "red"}, 1500)
+                      .hide(1000, function() {
+                        $(this).remove();
+                    })
+            }
+        })
+    }
+    function updateUser(login) {
+        $.ajax({
+            type: "GET",
+            url: "service/"+login,
+            success: function (user) {
+                var i = 0;
+                $.each(user, function(index, value) {// fills in the form of user data
+                    if (index == "_id")
+                        return true;
+                    if (index == "login") {
+                        $("#form1 input")[i].disabled = true;
+                        checkExistsMessageOk($("#form1 input")[i]);
+                    }
+                    if (i == 2)
+                        i++;
+                    $("#form1 input")[i].value = value;
+                        i++;
+               });
+               // $("#form1 input:last").show("Update user");
+            }
+        });
+        openForm();
+        $('#submitCreate').hide();
+        $("#submitUpdate").show("slow");
+        $('#form1 #submitUpdate').on('click', function (event) { //send to the server data from the form
+            event.preventDefault();
+            var arrData = $('#form1').serializeArray();
+            $.ajax({ // update information about user
+                type: "PUT",
+                url: "service/"+login,
+                data: $('#form1').serialize(),
+                dataType: "html",
+                success: function(msg) {
+                    if (msg == "error")
+                        alert('Internal Server Error!');
+                    else {
+                        $("#form1").hide(1000);
+                        $("#form1 input[type=text],#form1 input[type=password]").val('');
+                        $("#main_menu").show(1000);
+                    }
+                }
+            });
+        })
+    }
+
     function drawTable(msg) //when page load draw table from DB
     {
         if (msg) {
-            var table = $('<table></table>').addClass('foo');
-            table.prepend("<tr class='header'><td>#</td><td>Login</td><td>Password</td><td>Email</td><td>First Name</td><td>Last Name</td><td>Age</td><td>Role</td></tr>");
             // draw table for users
             $.each(msg, function (index, element) {
                 var row = $('<tr></tr>').addClass('bar');
@@ -33,6 +107,8 @@ $(document).ready(function () {
                     table.append(row);
                 });
                 row.append(td).prepend(firstTd);// add header row
+                var lastTd = $("<td><a href='#' id='deleteUser'>Delete User</a>&nbsp;&nbsp;<a href='#' id='updateUser'>Update User</a></td>");
+                row.append(lastTd);
             });
         }
         else
@@ -59,17 +135,17 @@ $(document).ready(function () {
                         if (!(/^[a-zA-Z][a-zA-Z0-9_\.]{3,11}$/.test($(element).val())) || !($(element).val()))
                             showError(element);
                         /*$.ajax({
-                            type: "GET",
-                            url: "/check",
-                            data: {login: $('#login').val()},
-                            success: function (answer){
-                        if (answer == true) {
+                         type: "GET",
+                         url: "/check",
+                         data: {login: $('#login').val()},
+                         success: function (answer){
+                         if (answer == true) {
 
-                        }
-                        else
-                            alert("this login already exists!")
-                    }
-                    });*/
+                         }
+                         else
+                         alert("this login already exists!")
+                         }
+                         });*/
                         else
                             checkExistsMessageOk(element);
                         break;
@@ -134,11 +210,14 @@ $(document).ready(function () {
     {
         var p = $(".complete").length;
         if (p == 7) {
-            ($("#submit").attr("disabled", false));
+            ($("#submitCreate").attr("disabled", false));
+            ($("#submitUpdate").attr("disabled", false));
             return true;
         }
-        else
-            ($("#submit").attr("disabled", true));
+        else {
+            ($("#submitCreate").attr("disabled", true));
+            ($("#submitUpdate").attr("disabled", true));
+        }
     }
 
     function showError(element) {
@@ -157,7 +236,7 @@ $(document).ready(function () {
         $("#birthday").datepicker();
     });
 
-    $('#form1').on('submit', function (event) { //intercept events submit
+    $('#form1 #submitCreate').on('click', function (event) { //send to the server data from the form
         event.preventDefault();
         var arrData = $('#form1').serializeArray();
         $.ajax({
@@ -165,7 +244,8 @@ $(document).ready(function () {
             url: "service",
             data: $('#form1').serialize(),
             dataType: "html",
-            success: function (msg) {
+            success: function (msg) { // add new user to DB
+
                 if (msg == 'error') {
                     alert('Internal Server Error!');
                 }
@@ -177,7 +257,7 @@ $(document).ready(function () {
                     $.each(arrData, function (index, value) {
                         if (arrData[index].name == "passwordConf") // ignore password confirm
                             return true;
-                        if (arrData[index].name == "birthday"){
+                        if (arrData[index].name == "birthday") {
                             var date = new Date().getFullYear();
                             var yearsbirth = new Date(arrData[index].value).getFullYear();
                             var age = date - yearsbirth;
@@ -187,7 +267,10 @@ $(document).ready(function () {
                         var td = $("<td></td>");
                         td.append(td1);
                         row.append(td);
+
                     });
+                    var tdLast = $("<td><a href='#' id='deleteUser'>Delete User</a>&nbsp;&nbsp;<a href='#' id='updateUser'>Update User</a></td>");
+                    row.append(tdLast);
                     $("table.foo tr:last").after(row);
                 }
             }
@@ -196,7 +279,9 @@ $(document).ready(function () {
         $("#form1 input[type=text],#form1 input[type=password]").val('');
         $("#main_menu").show(1000);
         //setTimeout(function() {$(".newRow").removeClass("newRow").addClass("bar") }, 5000);
-        setTimeout(function() {$(".newRow").animate({backgroundColor: "#8B8989"}, 2500) }, 4000);
+        setTimeout(function () {
+            $(".newRow").animate({backgroundColor: "#8B8989"}, 2500)
+        }, 4000);
     });
 });
 

@@ -31,6 +31,7 @@ app.use(app.router);
 
 app.get('/', routes.index);
 app.get('/service', users.userlist);
+app.get('/service/:user_login', users.getuser);
 app.get('/check', users.checklogin);
 app.post('/service', users.adduser);
 app.del('/service/:user_login', users.delete);

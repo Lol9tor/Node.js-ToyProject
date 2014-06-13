@@ -9,11 +9,14 @@ table {
 	padding: 10px;
 	margin: 30px 0 0 20px;
 }
-td, tr {padding: 10px;}
+td, tr {
+    padding: 10px;
+    }
 table.foo {
 	border: solid 2px;
 	margin: 0;
-	padding: 0;	
+	padding: 0;
+    text-align: center;
 }
 .foo td {
 	height: 30px;
@@ -22,8 +25,11 @@ table.foo {
 a:link {
 	color : SaddleBrown;
 	font-family : comic sans ms;
-	font-size: 16pt;
-} 
+	font-size: 14pt;
+}
+a:hover {
+    color : LemonChiffon; text-decoration : none;
+}
 /* The hint to Hide and Show */
 .hint {
    	border: solid 1px;
@@ -51,12 +57,8 @@ a:link {
 }
 .newRow {
     background: green;
-    transition: 3s;
 }
 
-a:hover {
-	color : LemonChiffon; text-decoration : none;		
-}
 div#form_users {
 	font-size: 12pt;
 	font-style: italic;
