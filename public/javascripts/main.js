@@ -13,7 +13,8 @@ $(document).ready(function () {
         }
         if ($(this).attr('id') === 'updateUser') {
             var userLogin = $(this).parent().prevAll()[6].firstChild.textContent;
-            updateUser(userLogin);
+            var strupd = $(this).parent().parent();
+            updateUser(userLogin, strupd);
         }
     });
     var passwordConf;
@@ -34,30 +35,44 @@ $(document).ready(function () {
             success: function() {
                 $(str).animate({backgroundColor: "red"}, 1500)
                       .hide(1000, function() {
-                        $(this).remove();
+                            $(this).remove();
                     })
             }
         })
     }
-    function updateUser(login) {
+    function updateUser(login, str) {
+        $('input[type=hidden]').val('');
         $.ajax({
             type: "GET",
             url: "service/"+login,
             success: function (user) {
-                var i = 0;
+                var i = 2;
                 $.each(user, function(index, value) {// fills in the form of user data
-                    if (index == "_id")
+                    if (index == "_id") {
+                        //$("#form1 input[type=hidden]").val(value);
+                        $("<input/>", {
+                            "type": "hidden",
+                            "name": "_id",
+                            "id": "_id",
+                            "value": value
+                        }).prependTo("#form1 table");
                         return true;
-                    if (index == "login") {
-                        $("#form1 input")[i].disabled = true;
-                        checkExistsMessageOk($("#form1 input")[i]);
                     }
-                    if (i == 2)
+                    if (index == "login") {
+                        $("#form1 input")[1].disabled = true;// disabled field "login"
+                        $("#form1 td input#login").next().addClass("error checked");// field "login" is valid
+                        $("<input/>", {
+                            "type": "hidden",
+                            "name": "login",
+                            "id": "login",
+                            "value": value
+                        }).insertAfter("#form1 table input#_id");
+                    }
+                    if (i == 4)
                         i++;
                     $("#form1 input")[i].value = value;
                         i++;
                });
-               // $("#form1 input:last").show("Update user");
             }
         });
         openForm();
@@ -68,13 +83,19 @@ $(document).ready(function () {
             var arrData = $('#form1').serializeArray();
             $.ajax({ // update information about user
                 type: "PUT",
-                url: "service/"+login,
+                url: "/service",
                 data: $('#form1').serialize(),
                 dataType: "html",
                 success: function(msg) {
                     if (msg == "error")
                         alert('Internal Server Error!');
                     else {
+                        $("input[type=hidden]").remove();// delete hidden fields
+                        $.each(arrData, function(index, element){
+                            var i = 2;
+                            $(str).find("td")[i].textContent = element.value;
+                            i++;
+                            });
                         $("#form1").hide(1000);
                         $("#form1 input[type=text],#form1 input[type=password]").val('');
                         $("#main_menu").show(1000);
@@ -115,100 +136,90 @@ $(document).ready(function () {
             alert("Error! No data.");
         $('#main_menu').append(table);
     }
-
+     $.validator.addMethod('validLogin', function (value, element) {// add method for validate login
+        var result = true;
+        if(!(/^[a-zA-Z][a-zA-Z0-9_\.]+$/.test(value))){
+        return false;
+            }
+        return result;
+    }, '');
     function openForm() {
+        $("#form1 input#login").next().removeClass("error checked");
         $("#main_menu").hide(1000);
         $("#form1").show(1000);
-        $.each($("#form1 input"), function (index, element) {	// show/hide hint
-            $(element).on("focus", function (event) { // show hint
-                $(element).next("span").show(1000);
-                $(element).parent().find(".error").hide();// hide hint about error when onfocus input
-                $(element).parent().find(".complete").remove();// remove hint about complete when onfocus input
-            });
-            $(element).on("blur", function (event) { // hide hint and validate form
-                $(element).next("span").hide(600);
-                //check input for valid data
-                var inputId = $(element).attr("id");
-                switch (inputId) {
-                    case "login":
-                    {
-                        if (!(/^[a-zA-Z][a-zA-Z0-9_\.]{3,11}$/.test($(element).val())) || !($(element).val()))
-                            showError(element);
-                        /*$.ajax({
-                         type: "GET",
-                         url: "/check",
-                         data: {login: $('#login').val()},
-                         success: function (answer){
-                         if (answer == true) {
-
-                         }
-                         else
-                         alert("this login already exists!")
-                         }
-                         });*/
-                        else
-                            checkExistsMessageOk(element);
-                        break;
+        $("#form1").validate({
+            focusInvalid: false,
+            focusCleanup: true,
+            rules: {
+                login: {
+                    required: true,
+                    validLogin: true,
+                    minlength: 4,
+                    maxlength: 16,
+                    remote: {
+                        url: 'check',
+                        type: 'get',
+                        data: {
+                            login: function () {
+                                return $('#login').val();
+                            }
+                        }
                     }
-                    case "password":
-                    {
-                        if (!(/^[a-zA-Z0-9]+$/.test($(element).val())) || !($(element).val()) || !(($(element).val().length) >= 6))
-                            showError(element);
-                        else
-                            checkExistsMessageOk(element);
-                        passwordConf = $(element).val();
-                        break;
-                    }
-                    case "passwordConf":
-                    {
-                        if (!(($(element).val()) == passwordConf) || !($(element).val()))
-                            showError(element);
-                        else
-                            checkExistsMessageOk(element);
-                        break;
-                    }
-                    case "email":
-                    {
-                        if (!(/^[a-zA-Z0-9_\-\.]+@[a-zA-Z0-9\-]+\.[a-zA-Z0-9\-\.]+$/.test($(element).val())) || !($(element).val()))
-                            showError(element);
-                        else
-                            checkExistsMessageOk(element);
-                        break;
-                    }
-                    case "firstName":
-                    {
-                        if (!(/^[a-zA-Z]+$/.test($(element).val())) || !($(element).val()))
-                            showError(element);
-                        else
-                            checkExistsMessageOk(element);
-                        break;
-                    }
-                    case "lastName":
-                    {
-                        if (!(/^[a-zA-Z]+$/.test($(element).val())) || !($(element).val()))
-                            showError(element);
-                        else
-                            checkExistsMessageOk(element);
-                        break;
-                    }
-                    case "birthday":
-                    {
-                        if (!($(element).val()))
-                            showError(element);
-                        else
-                            checkExistsMessageOk(element);
-                        break;
-                    }
+                },
+                password: {
+                    required: true,
+                    minlength: 6,
+                    maxlength: 16
+                },
+                passwordConf: {
+                    required: true,
+                    equalTo: '#password'
+                },
+                email: {
+                    required: true,
+                    email: true
+                },
+                firstName: {
+                    required: true,
+                    rangelength: [2, 20],
+                    lettersonly: true
+                },
+                lastName: {
+                    required: true,
+                    rangelength: [2, 20],
+                    lettersonly: true
+                },
+                birthday: {
+                    required: true,
+                    date: true
                 }
-                // end validation
-                enableSubmit();
-            });
+            },
+            messages: {
+                login: {
+                    validLogin: "Login must have latin words and numbers(must start on words)",
+                    remote: "This name already exist"
+                },
+                birthday: {
+                    date: "Date must to be in MM/DD/YYYY format"
+                }
+            },
+            success: function(label) {
+                label.html("&nbsp;").addClass("checked");
+            },
+            highlight: function(element) {
+               // $(element).next().attr("class", "error");
+                $(element).next().removeClass("checked");
+            }
         });
+        $("#form1 input").on("blur", function(){
+            enableSubmit();
+        });
+
     }
 
     function enableSubmit()// enabled submit when form valid
     {
-        var p = $(".complete").length;
+        var p = $(".checked").length;
         if (p == 7) {
             ($("#submitCreate").attr("disabled", false));
             ($("#submitUpdate").attr("disabled", false));
@@ -219,19 +230,6 @@ $(document).ready(function () {
             ($("#submitUpdate").attr("disabled", true));
         }
     }
-
-    function showError(element) {
-        $(element).parent().find(".error").delay(650).show(600);
-        return true;
-    }
-
-    function checkExistsMessageOk(element) {
-        if ($(element).parent().find("span.complete").length)// exists element
-            return true;
-        $(element).parent().append("<span class='complete'>OK</span>"); //add element and draw it
-        $(".complete").delay(650).show(600);
-    }
-
     $(function () { // add calendar to input "birthday"
         $("#birthday").datepicker();
     });
@@ -247,7 +245,7 @@ $(document).ready(function () {
             success: function (msg) { // add new user to DB
 
                 if (msg == 'error') {
-                    alert('Internal Server Error!');
+                        alert('Internal Server Error!');
                 }
                 else {  // draw new str and add it to table
                     var td1 = "";
@@ -255,6 +253,8 @@ $(document).ready(function () {
                     var firstTd = $("<td>New User</td>");
                     row.append(firstTd);
                     $.each(arrData, function (index, value) {
+                        if (arrData[index].name == "_id") // ignore _id
+                            return true;
                         if (arrData[index].name == "passwordConf") // ignore password confirm
                             return true;
                         if (arrData[index].name == "birthday") {
@@ -278,6 +278,7 @@ $(document).ready(function () {
         $("#form1").hide(1000);
         $("#form1 input[type=text],#form1 input[type=password]").val('');
         $("#main_menu").show(1000);
+        $("label.checked").removeClass("checked error");
         //setTimeout(function() {$(".newRow").removeClass("newRow").addClass("bar") }, 5000);
         setTimeout(function () {
             $(".newRow").animate({backgroundColor: "#8B8989"}, 2500)

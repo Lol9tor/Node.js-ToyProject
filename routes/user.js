@@ -29,7 +29,7 @@ exports.adduser = function (req, res) {
             console.log('error');
         } else {
             res.statusCode = 200;
-            res.send('ok');
+            res.json(doc);
         }
     });
 };
@@ -64,7 +64,7 @@ exports.update = function (req, res) {
             console.log('updating error');
         } else {
             res.statusCode = 200;
-            res.send('ok');
+            res.json(doc);
         }
     });
 };

@@ -1,3 +1,4 @@
+/*CSS document*/
 body {
 	background: #8B8989;
 	font-family: Arial, sans-serif;
@@ -5,7 +6,7 @@ body {
 	font-style: normal;
 }
 table {
-	height: 30px;
+	height: 20px;
 	padding: 10px;
 	margin: 30px 0 0 20px;
 }
@@ -19,7 +20,7 @@ table.foo {
     text-align: center;
 }
 .foo td {
-	height: 30px;
+	height: 20px;
 	border: solid 1px;
 }
 a:link {
@@ -31,21 +32,20 @@ a:hover {
     color : LemonChiffon; text-decoration : none;
 }
 /* The hint to Hide and Show */
-.hint {
-   	border: solid 1px;
-	display: none;
-	padding: 0 5px 0 5px;
-	background: yellow;
-	position: relative; 
-	left: 25px;
+
+label span {
+    color: #EA5200;
+    font-weight:bold;
 }
-.error {
-    border: solid 1px;
-    display: none;
-    padding: 0 5px 0 5px;
-    background: red;
-    position: relative;
-    left: 25px;
+label.error {
+    background:url("images/unchecked.gif") no-repeat 0px 0px;
+    padding-left: 17px;
+    padding-bottom: 5px;
+    color: Tomato;
+    font-weight:bold;
+}
+label.checked {
+    background:url("images/checked.gif") no-repeat 0px 0px;
 }
 .complete {
     border: solid 1px;
